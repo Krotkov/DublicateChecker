@@ -31,6 +31,7 @@ private slots:
     void openFile(QTreeWidgetItem* item, int);
     //void scan_directory(QString const& dir);
     void show_about_dialog();
+    void deleteFiles();
 
 private:
     std::unique_ptr<Ui::MainWindow> ui;

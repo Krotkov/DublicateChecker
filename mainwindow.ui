@@ -39,7 +39,12 @@
         </attribute>
         <column>
          <property name="text">
-          <string>Filename</string>
+          <string>File name</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>File path</string>
          </property>
         </column>
         <column>

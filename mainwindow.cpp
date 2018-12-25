@@ -42,6 +42,7 @@ main_window::main_window(QWidget *parent)
     connect(ui->actionAbout, &QAction::triggered, this, &main_window::show_about_dialog);
     connect(ui->actionStop, &QAction::triggered, this, &main_window::finish);
     connect(ui->stopButton, &QPushButton::clicked, this, &main_window::stopSearching);
+    connect(ui->deleteButton, &QPushButton::clicked, this, &main_window::deleteFiles);
 }
 
 main_window::~main_window()
@@ -85,10 +86,12 @@ void main_window::showDublicates(QVector<QString> const& dublicates) {
     QTreeWidgetItem* item = new QTreeWidgetItem(ui->treeWidget);
     QFileInfo fileInfo(dublicates[0]);
     item->setText(0, QString("There is " + QString::number(dublicates.size()) + " dublicated files"));
-    item->setText(1, QString::number(fileInfo.size()));
+    item->setText(2, QString::number(fileInfo.size()));
     for (QString const& filePath: dublicates) {
+        QFileInfo file(filePath);
         QTreeWidgetItem* childItem = new QTreeWidgetItem();
-        childItem->setText(0, filePath);
+        childItem->setText(0, file.baseName());
+        childItem->setText(1, file.filePath());
         item->addChild(childItem);
     }
     ui->treeWidget->addTopLevelItem(item);
@@ -117,8 +120,48 @@ void main_window::stopSearching() {
 }
 
 void main_window::openFile(QTreeWidgetItem* item, int) {
-    QFile file(item->text(0));
+    QFile file(item->text(1));
     if (file.exists()) {
-        QDesktopServices::openUrl(item->text(0));
+        QDesktopServices::openUrl(item->text(1));
+    }
+}
+
+void main_window::deleteFiles() {
+    auto selectedItems = ui->treeWidget->selectedItems();
+    QSet<QTreeWidgetItem* > toDelete;
+    for (auto const& selectedItem: selectedItems) {
+        if (!selectedItem->childCount()) {
+            toDelete.insert(selectedItem);
+        } else {
+            auto children = selectedItem->takeChildren();
+            for (auto const& child: children) {
+                toDelete.insert(child);
+                selectedItem->addChild(child);
+            }
+        }
+    }
+
+    auto answer = QMessageBox::question(this, "Deleting",
+                                        "Do you want to delete " + QString::number(toDelete.size()) + " selected files?");
+    if (answer == QMessageBox::No) {
+        return;
+    }
+
+    QSet<QTreeWidgetItem*> changedItems;
+
+    for (auto const& item: toDelete) {
+        QFile file(item->text(1));
+        if (file.remove()) {
+            changedItems.insert(item->parent());
+            item->parent()->removeChild(item);
+        }
+    }
+
+    for (auto const& item: changedItems) {
+        if (item->childCount() > 1) {
+            item->setText(2, "There is " + QString::number(item->childCount()) + " dublicated files");
+        } else {
+            delete item;
+        }
     }
 }
