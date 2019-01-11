@@ -26,6 +26,7 @@ void Searcher::getDublicates() {
         sumSize += fileInfo.size();
         firstGroups[fileInfo.size()].push_back(filePath);
     }
+    emit progress(1);
     if (sumSize == 0) {
         emit progress(100);
         emit finishSearching();
@@ -43,7 +44,9 @@ void Searcher::getDublicates() {
                 emit finishSearching();
                 return;
             }
-            secondGroups[getPrefix(filePath, std::min(MAXN, firstIt.key()))].push_back(filePath);
+            try {
+                secondGroups[getPrefix(filePath, std::min(MAXN, firstIt.key()))].push_back(filePath);
+            } catch (QString) {}
             curSize += firstIt.key();
             updateProgress(curSize);
         }
@@ -90,6 +93,8 @@ QString Searcher::getPrefix(QString const& filePath, qint64 number) {
         QString prefix = file.read(number);
         return prefix;
     }
+
+    throw QString("Can't open file");
 }
 
 QByteArray Searcher::getHash (QString const& filePath) {
