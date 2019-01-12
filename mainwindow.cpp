@@ -47,8 +47,10 @@ main_window::main_window(QWidget *parent)
 
 main_window::~main_window()
 {
-    thread->exit();
-    thread->wait();
+    if (thread != nullptr) {
+        thread->exit();
+        thread->wait();
+    }
 }
 
 void main_window::select_directory()
@@ -151,7 +153,7 @@ void main_window::deleteFiles() {
 
     for (auto const& item: toDelete) {
         QFile file(item->text(1));
-        if (file.remove()) {
+        if (!file.exists() || file.remove()) {
             changedItems.insert(item->parent());
             item->parent()->removeChild(item);
         }

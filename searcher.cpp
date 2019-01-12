@@ -46,7 +46,9 @@ void Searcher::getDublicates() {
             }
             try {
                 secondGroups[getPrefix(filePath, std::min(MAXN, firstIt.key()))].push_back(filePath);
-            } catch (QString) {}
+            } catch (QString) {
+                curSize += firstIt.key();
+            }
             curSize += firstIt.key();
             updateProgress(curSize);
         }
