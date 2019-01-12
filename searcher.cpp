@@ -65,7 +65,9 @@ void Searcher::getDublicates() {
                     emit finishSearching();
                     return;
                 }
+                try {
                 finalGroups[getHash(filePath)].push_back(filePath);
+                } catch (QString&) {}
                 curSize += firstIt.key();
                 updateProgress(curSize);
             }
@@ -105,11 +107,11 @@ QByteArray Searcher::getHash (QString const& filePath) {
             return fileHash.result();
         }
     }
-    return QByteArray();
+    throw QString("Can't get hash");
 }
 
 void Searcher::updateProgress(qint64 curSize) {
-    qint64 newPercent = curSize * 50 / (sumSize);
+    int newPercent = curSize * 50 / (sumSize);
     if (newPercent > percent) {
         percent = newPercent;
         emit progress(percent);

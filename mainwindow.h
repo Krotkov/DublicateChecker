@@ -16,20 +16,18 @@ class main_window : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit main_window(QWidget *parent = 0);
+    explicit main_window(QWidget *parent = nullptr);
     ~main_window();
 
 public slots:
     void showDublicates(QVector<QString> const&);
     void setProgress(int);
-    //void setProgressRange(int);
 
 private slots:
     void finish();
     void stopSearching();
     void select_directory();
     void openFile(QTreeWidgetItem* item, int);
-    //void scan_directory(QString const& dir);
     void show_about_dialog();
     void deleteFiles();
 

@@ -25,7 +25,7 @@ private:
     QString getPrefix(QString const& filepath, qint64 number);
     QString dir;
     qint64 sumSize;
-    qint64 percent;
+    int percent;
     void updateProgress(qint64 curSize);
     bool checkStop();
 };
